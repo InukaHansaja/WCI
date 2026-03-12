@@ -1,0 +1,568 @@
+/* ─── RESET & BASE ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: #1a0f0a;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Montserrat', sans-serif;
+  overflow-x: hidden;
+  padding: 20px 0 60px;
+}
+
+/* ─── STEP 1: CLICK PROMPT ─── */
+#click-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  animation: floatBob 2.5s ease-in-out infinite;
+  transition: opacity 0.6s ease;
+  position: relative;
+  z-index: 10;
+}
+#click-prompt.hidden { opacity: 0; pointer-events: none; }
+
+.prompt-envelope svg { width: 110px; filter: drop-shadow(0 4px 18px #c9aa6088); }
+
+.prompt-text {
+  color: #f5e6c8;
+  font-family: 'Great Vibes', cursive;
+  font-size: 2rem;
+  margin-top: 14px;
+  letter-spacing: 1px;
+}
+.prompt-sub {
+  color: #c9aa60;
+  font-size: 0.75rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+@keyframes floatBob {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
+
+/* ─── STEP 2: ENVELOPE SCENE ─── */
+#scene {
+  position: relative;
+  width: 460px;
+  height: 340px;
+  display: none;
+  margin: 40px auto;
+}
+#scene.visible { display: block; }
+#scene.fade-out {
+  animation: fadeOut 0.7s ease forwards;
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; transform: scale(0.9); }
+}
+
+.env-body {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, #f5edd8 0%, #ede0c0 100%);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 12px 50px #0007;
+}
+
+.env-fold-left {
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 0; height: 0;
+  border-style: solid;
+  border-width: 170px 0 0 230px;
+  border-color: transparent transparent transparent #e0d3b0;
+}
+.env-fold-right {
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 0; height: 0;
+  border-style: solid;
+  border-width: 170px 230px 0 0;
+  border-color: transparent #ddd0aa transparent transparent;
+}
+.env-fold-bottom {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 230px 170px 230px;
+  border-color: transparent transparent #e8dfc8 transparent;
+}
+
+/* ─── COVER CARD (inside envelope) ─── */
+#cover-card {
+  position: absolute;
+  left: 20px; right: 20px;
+  bottom: 10px;
+  height: 300px;
+  background: #faf7f0;
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px #0003;
+  cursor: pointer;
+  transition: transform 0.8s cubic-bezier(.4,0,.2,1), opacity 0.8s ease;
+  transform: translateY(0);
+  z-index: 2;
+}
+#cover-card.slide-up {
+  transform: translateY(-380px);
+}
+#cover-card.detached {
+  position: center;
+  left: auto; right: auto; bottom: auto;
+  width: 100%;
+  max-width: 460px;
+  height: auto;
+  min-height: 340px;
+  box-shadow: 0 20px 70px #0005;
+  cursor: default;
+  transform: none !important;
+}
+
+.cover-inner {
+  padding: 24px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  position: relative;
+}
+
+.cover-silhouette {
+  width: 120px;
+  height: 110px;
+  margin-bottom: 4px;
+}
+.cover-silhouette svg { width: 100%; height: 100%; }
+
+.cover-title-wrap {
+  text-align: center;
+  line-height: 1.1;
+}
+.cover-wedding {
+  font-family: 'Great Vibes', cursive;
+  font-size: 2.2rem;
+  color: #c9aa60;
+  letter-spacing: 1px;
+}
+.cover-invitation {
+  font-family: 'Great Vibes', cursive;
+  font-size: 2.2rem;
+  color: #c9aa60;
+  letter-spacing: 1px;
+}
+
+.cover-monogram {
+  width: 90px;
+  height: 80px;
+  margin-top: 8px;
+  cursor: pointer;
+}
+.cover-monogram svg { width: 100%; height: 100%; }
+
+.cover-tap-hint {
+  position: absolute;
+  bottom: 10px;
+  right: 14px;
+  font-size: 0.65rem;
+  color: #c9aa60;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  animation: pulse 1.8s ease-in-out infinite;
+  cursor: pointer;
+}
+
+@keyframes pulse {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ─── ENVELOPE FLAP ─── */
+.env-flap {
+  position: absolute;
+  top: 0; left: 0;
+  width: 460px;
+  height: 170px;
+  transform-origin: top center;
+  transform: rotateX(0deg);
+  transition: transform 0.9s cubic-bezier(.4,0,.2,1);
+  z-index: 10;
+  transform-style: preserve-3d;
+}
+.env-flap.open {
+  transform: rotateX(-175deg);
+}
+.env-flap svg { width: 100%; height: 100%; display: block; }
+
+.wax-seal {
+  position: absolute;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 52px; height: 52px;
+  background: radial-gradient(circle at 40% 35%, #c0392b, #7b0d0d);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 12px #0005;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  z-index: 11;
+}
+.wax-seal span {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.75rem;
+  color: #f5e6c8;
+  letter-spacing: 1px;
+}
+.wax-seal.broken {
+  opacity: 0;
+  transform: translateX(-50%) scale(1.4);
+}
+
+.four-image {
+  width: 200%;
+  height: 120%;
+  position: relative;
+  top: -120px;
+  left: -60px;
+}
+
+/* ─── STEP 3: CARD STAGE ─── */
+#card-stage {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 500px;
+  padding: 0 16px 60px;
+}
+#card-stage.visible {
+  display: flex;
+}
+
+/* ─── MAIN INVITATION CARD ─── */
+#invitation-card {
+  width: 100%;
+  max-width: 460px;
+  background: #faf7f0;
+  border-radius: 4px;
+  box-shadow: 0 20px 70px #0005;
+  overflow: hidden;
+  position: relative;
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+#invitation-card.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.card-inner {
+  padding: 50px 32px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+/* Gold leaves overlay */
+.card-leaves {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.cm-image {
+  width: 100px;
+  height: 90px;
+  margin-bottom: 12px;
+}
+
+/* Parents */
+.parents-line {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: #1a1a1a;
+  text-align: center;
+  margin-bottom: 2px;
+  position: relative;
+  z-index: 2;
+}
+.together-with {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 400;
+  letter-spacing: 3px;
+  color: #444;
+  margin: 4px 0;
+  position: relative;
+  z-index: 2;
+}
+.honor-line {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.6rem;
+  letter-spacing: 1.5px;
+  color: #333;
+  text-align: center;
+  margin: 10px 0 14px;
+  position: relative;
+  z-index: 2;
+}
+
+/* Guest name */
+.guest-prefix {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  color: #555;
+  margin-bottom: 4px;
+  position: relative;
+  z-index: 2;
+}
+.guest-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 400;
+  color: #1a1a1a;
+  letter-spacing: 1px;
+  position: relative;
+  z-index: 2;
+}
+.name-underline {
+  width: 85%;
+  border-bottom: 1px dotted #aaa;
+  margin: 6px 0 14px;
+  position: relative;
+  z-index: 2;
+}
+
+.celebrate-line {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 2px;
+  color: #333;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+.loving-children {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 2px;
+  color: #333;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 2;
+}
+
+/* Couple names */
+.couple-names {
+  font-family: 'Great Vibes', cursive;
+  font-size: 3rem;
+  color: #1a1a1a;
+  text-align: center;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 2;
+}
+
+.join-line {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 3px;
+  color: #333;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 2;
+}
+
+/* Date box */
+.date-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-top: 1.5px solid #1a1a1a;
+  border-bottom: 1.5px solid #1a1a1a;
+  padding: 8px 20px;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 2;
+}
+.date-month, .date-year {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 3px;
+  color: #1a1a1a;
+}
+.date-day {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  line-height: 1;
+}
+.date-sep {
+  color: #999;
+  font-size: 1.2rem;
+}
+
+.day-name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 4px;
+  color: #1a1a1a;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 2;
+}
+
+.at-line {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 3px;
+  color: #555;
+  margin-bottom: 4px;
+  position: relative;
+  z-index: 2;
+}
+.venue-name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #1a1a1a;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+.venue-city {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  color: #333;
+  margin-bottom: 6px;
+  position: relative;
+  z-index: 2;
+}
+.venue-time {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: #1a1a1a;
+  position: relative;
+  z-index: 2;
+}
+.venue-poruwa {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: #555;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.rsvp-word {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 5px;
+  color: #555;
+  margin-top: 10px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ─── RSVP PANEL ─── */
+#rsvp-panel {
+  width: 100%;
+  max-width: 460px;
+  background: #faf7f0;
+  border-radius: 4px;
+  padding: 30px 24px;
+  text-align: center;
+  margin-top: 20px;
+  box-shadow: 0 8px 30px #0004;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease 0.3s, transform 0.8s ease 0.3s;
+}
+#rsvp-panel.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.rsvp-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  color: #888;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.rsvp-deadline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.9rem;
+  color: #555;
+  font-style: italic;
+}
+.rsvp-date-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 16px;
+}
+
+.qr-box {
+  width: 90px;
+  height: 90px;
+  margin: 0 auto 16px;
+  padding: 8px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.qr-code {
+  width: 100%;
+  height: 100%;
+}
+.qr-box svg { width: 100%; height: 100%; }
+
+.contact-line {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.82rem;
+  color: #333;
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 500px) {
+  #scene { width: 92vw; height: calc(92vw * 0.74); }
+  .env-flap { width: 92vw; }
+  #cover-card { left: 10px; right: 10px; }
+  .couple-names { font-size: 2.4rem; }
+  .card-inner { padding: 40px 20px 30px; }
+}

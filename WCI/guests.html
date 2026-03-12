@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Guest List — Charith &amp; Maneesha</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #1a1209;
+      color: #f0e6cc;
+      padding: 30px 20px 60px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 1.8rem;
+      color: #d4af37;
+      margin-bottom: 6px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #b8930a;
+      margin-bottom: 24px;
+      font-size: 0.95rem;
+    }
+    /* ── Controls ── */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .controls input {
+      padding: 8px 14px;
+      border-radius: 6px;
+      border: 1px solid #b8930a;
+      background: #2a1e0a;
+      color: #f0e6cc;
+      font-size: 0.95rem;
+      width: 260px;
+    }
+    .controls input::placeholder { color: #7a6035; }
+    .btn {
+      padding: 8px 18px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .btn-gold   { background: #b8930a; color: #1a1209; }
+    .btn-gold:hover { background: #d4af37; }
+    .btn-green  { background: #1a6b35; color: #fff; }
+    .btn-green:hover { background: #228045; }
+    /* ── Stats ── */
+    .stats {
+      text-align: center;
+      font-size: 0.88rem;
+      color: #9a7a40;
+      margin-bottom: 18px;
+    }
+    /* ── Table ── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 8px;
+      border: 1px solid #3a2a0a;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    thead tr {
+      background: #2e1f08;
+      color: #d4af37;
+    }
+    thead th {
+      padding: 12px 14px;
+      text-align: left;
+      white-space: nowrap;
+    }
+    tbody tr:nth-child(even) { background: #1f1508; }
+    tbody tr:nth-child(odd)  { background: #231a09; }
+    tbody tr:hover { background: #2e2010; }
+    td { padding: 10px 14px; vertical-align: middle; }
+    .num { color: #7a6035; font-size: 0.8rem; }
+    .name-cell { font-weight: 600; color: #f0e6cc; }
+    .prefix-cell { color: #c9aa60; font-size: 0.82rem; }
+    .link-cell {
+      font-size: 0.78rem;
+      color: #9a7a40;
+      max-width: 340px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* ── Buttons in table ── */
+    .copy-btn, .wa-btn, .edit-btn {
+      padding: 4px 10px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-weight: 600;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .copy-btn  { background: #3a2a0a; color: #d4af37; border: 1px solid #b8930a; }
+    .copy-btn:hover  { background: #b8930a; color: #1a1209; }
+    .copy-btn.copied { background: #1a6b35; color: #fff; border-color: #1a6b35; }
+    .wa-btn    { background: #128C7E; color: #fff; margin-left: 4px; }
+    .wa-btn:hover    { background: #075E54; }
+    .edit-btn  { background: #2a1e0a; color: #b8930a; border: 1px solid #3a2a0a; margin-left: 4px; }
+    .edit-btn:hover  { background: #3a2a0a; }
+    /* ── Add Guest Panel ── */
+    .add-panel {
+      background: #2a1e0a;
+      border: 1px solid #3a2a0a;
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .add-panel input, .add-panel select {
+      padding: 7px 12px;
+      border-radius: 6px;
+      border: 1px solid #b8930a;
+      background: #1a1209;
+      color: #f0e6cc;
+      font-size: 0.9rem;
+    }
+    .add-panel input { width: 200px; }
+    .add-panel select { width: 170px; }
+    /* ── Base URL input ── */
+    .baseurl-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .baseurl-row label { color: #b8930a; font-size: 0.88rem; }
+    .baseurl-row input {
+      padding: 7px 12px;
+      border-radius: 6px;
+      border: 1px solid #b8930a;
+      background: #2a1e0a;
+      color: #f0e6cc;
+      font-size: 0.88rem;
+      width: 340px;
+    }
+    /* ── Toast ── */
+    #toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      background: #1a6b35; color: #fff; padding: 10px 22px;
+      border-radius: 20px; font-size: 0.9rem; opacity: 0;
+      transition: opacity 0.3s; pointer-events: none; z-index: 999;
+    }
+    #toast.show { opacity: 1; }
+    /* ── Export note ── */
+    .export-note {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #7a6035;
+      margin-top: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>💌 Guest List</h1>
+<p class="subtitle">Charith &amp; Maneesha — April 23, 2026 &nbsp;|&nbsp; Personalised Invitation Links</p>
+
+<!-- Base URL row -->
+<div class="baseurl-row">
+  <label>🔗 Base URL:</label>
+  <input type="text" id="base-url" value="index.html" placeholder="https://yoursite.com/index.html" />
+  <button class="btn btn-gold" onclick="refreshLinks()">Update Links</button>
+</div>
+
+<!-- Add guest panel -->
+<div class="add-panel">
+  <strong style="color:#d4af37">➕ Add Guest:</strong>
+  <input type="text" id="new-name" placeholder="Full name" />
+  <select id="new-prefix">
+    <option value="MR.">MR.</option>
+    <option value="MRS.">MRS.</option>
+    <option value="MISS">MISS</option>
+    <option value="MR. &amp; MRS." selected>MR. &amp; MRS.</option>
+    <option value="DR.">DR.</option>
+    <option value="REV.">REV.</option>
+  </select>
+  <button class="btn btn-gold" onclick="addGuest()">Add</button>
+  <button class="btn btn-green" onclick="copyAll()">📋 Copy All Links</button>
+  <button class="btn" style="background:#6b2020;color:#fff" onclick="exportCSV()">⬇ Export CSV</button>
+</div>
+
+<!-- Search + stats -->
+<div class="controls">
+  <input type="text" id="search" placeholder="🔍 Search guest name…" oninput="renderTable()" />
+</div>
+<p class="stats" id="stats"></p>
+
+<!-- Table -->
+<div class="table-wrap">
+  <table id="guest-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Prefix</th>
+        <th>Name</th>
+        <th>Personalised Link</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<p class="export-note">
+  💡 Share each link via WhatsApp, SMS or email. The invitation will open with the guest's name pre-filled.<br/>
+  This page is <strong>local only</strong> — data is saved in your browser (localStorage).
+</p>
+
+<div id="toast"></div>
+
+<script>
+// ── Default guest list (250 slots — fill in real names) ──────────
+const DEFAULT_GUESTS = [
+  // Prefixes: "MR." | "MRS." | "MISS" | "MR. & MRS." | "DR." | "REV."
+  // Format:   { name: "Full Name", prefix: "MR." }
+  { name: "Sanduni Perera",       prefix: "MISS" },
+  { name: "Guest 2",              prefix: "MR. & MRS." },
+  { name: "Guest 3",              prefix: "MR. & MRS." },
+  { name: "Guest 4",              prefix: "MR. & MRS." },
+  { name: "Guest 5",              prefix: "MR. & MRS." },
+  { name: "Guest 6",              prefix: "MR. & MRS." },
+  { name: "Guest 7",              prefix: "MR. & MRS." },
+  { name: "Guest 8",              prefix: "MR. & MRS." },
+  { name: "Guest 9",              prefix: "MR. & MRS." },
+  { name: "Guest 10",             prefix: "MR. & MRS." },
+  { name: "Guest 11",             prefix: "MR. & MRS." },
+  { name: "Guest 12",             prefix: "MR. & MRS." },
+  { name: "Guest 13",             prefix: "MR. & MRS." },
+  { name: "Guest 14",             prefix: "MR. & MRS." },
+  { name: "Guest 15",             prefix: "MR. & MRS." },
+  { name: "Guest 16",             prefix: "MR. & MRS." },
+  { name: "Guest 17",             prefix: "MR. & MRS." },
+  { name: "Guest 18",             prefix: "MR. & MRS." },
+  { name: "Guest 19",             prefix: "MR. & MRS." },
+  { name: "Guest 20",             prefix: "MR. & MRS." },
+  { name: "Guest 21",             prefix: "MR. & MRS." },
+  { name: "Guest 22",             prefix: "MR. & MRS." },
+  { name: "Guest 23",             prefix: "MR. & MRS." },
+  { name: "Guest 24",             prefix: "MR. & MRS." },
+  { name: "Guest 25",             prefix: "MR. & MRS." },
+  { name: "Guest 26",             prefix: "MR. & MRS." },
+  { name: "Guest 27",             prefix: "MR. & MRS." },
+  { name: "Guest 28",             prefix: "MR. & MRS." },
+  { name: "Guest 29",             prefix: "MR. & MRS." },
+  { name: "Guest 30",             prefix: "MR. & MRS." },
+  { name: "Guest 31",             prefix: "MR. & MRS." },
+  { name: "Guest 32",             prefix: "MR. & MRS." },
+  { name: "Guest 33",             prefix: "MR. & MRS." },
+  { name: "Guest 34",             prefix: "MR. & MRS." },
+  { name: "Guest 35",             prefix: "MR. & MRS." },
+  { name: "Guest 36",             prefix: "MR. & MRS." },
+  { name: "Guest 37",             prefix: "MR. & MRS." },
+  { name: "Guest 38",             prefix: "MR. & MRS." },
+  { name: "Guest 39",             prefix: "MR. & MRS." },
+  { name: "Guest 40",             prefix: "MR. & MRS." },
+  { name: "Guest 41",             prefix: "MR. & MRS." },
+  { name: "Guest 42",             prefix: "MR. & MRS." },
+  { name: "Guest 43",             prefix: "MR. & MRS." },
+  { name: "Guest 44",             prefix: "MR. & MRS." },
+  { name: "Guest 45",             prefix: "MR. & MRS." },
+  { name: "Guest 46",             prefix: "MR. & MRS." },
+  { name: "Guest 47",             prefix: "MR. & MRS." },
+  { name: "Guest 48",             prefix: "MR. & MRS." },
+  { name: "Guest 49",             prefix: "MR. & MRS." },
+  { name: "Guest 50",             prefix: "MR. & MRS." },
+  { name: "Guest 51",             prefix: "MR. & MRS." },
+  { name: "Guest 52",             prefix: "MR. & MRS." },
+  { name: "Guest 53",             prefix: "MR. & MRS." },
+  { name: "Guest 54",             prefix: "MR. & MRS." },
+  { name: "Guest 55",             prefix: "MR. & MRS." },
+  { name: "Guest 56",             prefix: "MR. & MRS." },
+  { name: "Guest 57",             prefix: "MR. & MRS." },
+  { name: "Guest 58",             prefix: "MR. & MRS." },
+  { name: "Guest 59",             prefix: "MR. & MRS." },
+  { name: "Guest 60",             prefix: "MR. & MRS." },
+  { name: "Guest 61",             prefix: "MR. & MRS." },
+  { name: "Guest 62",             prefix: "MR. & MRS." },
+  { name: "Guest 63",             prefix: "MR. & MRS." },
+  { name: "Guest 64",             prefix: "MR. & MRS." },
+  { name: "Guest 65",             prefix: "MR. & MRS." },
+  { name: "Guest 66",             prefix: "MR. & MRS." },
+  { name: "Guest 67",             prefix: "MR. & MRS." },
+  { name: "Guest 68",             prefix: "MR. & MRS." },
+  { name: "Guest 69",             prefix: "MR. & MRS." },
+  { name: "Guest 70",             prefix: "MR. & MRS." },
+  { name: "Guest 71",             prefix: "MR. & MRS." },
+  { name: "Guest 72",             prefix: "MR. & MRS." },
+  { name: "Guest 73",             prefix: "MR. & MRS." },
+  { name: "Guest 74",             prefix: "MR. & MRS." },
+  { name: "Guest 75",             prefix: "MR. & MRS." },
+  { name: "Guest 76",             prefix: "MR. & MRS." },
+  { name: "Guest 77",             prefix: "MR. & MRS." },
+  { name: "Guest 78",             prefix: "MR. & MRS." },
+  { name: "Guest 79",             prefix: "MR. & MRS." },
+  { name: "Guest 80",             prefix: "MR. & MRS." },
+  { name: "Guest 81",             prefix: "MR. & MRS." },
+  { name: "Guest 82",             prefix: "MR. & MRS." },
+  { name: "Guest 83",             prefix: "MR. & MRS." },
+  { name: "Guest 84",             prefix: "MR. & MRS." },
+  { name: "Guest 85",             prefix: "MR. & MRS." },
+  { name: "Guest 86",             prefix: "MR. & MRS." },
+  { name: "Guest 87",             prefix: "MR. & MRS." },
+  { name: "Guest 88",             prefix: "MR. & MRS." },
+  { name: "Guest 89",             prefix: "MR. & MRS." },
+  { name: "Guest 90",             prefix: "MR. & MRS." },
+  { name: "Guest 91",             prefix: "MR. & MRS." },
+  { name: "Guest 92",             prefix: "MR. & MRS." },
+  { name: "Guest 93",             prefix: "MR. & MRS." },
+  { name: "Guest 94",             prefix: "MR. & MRS." },
+  { name: "Guest 95",             prefix: "MR. & MRS." },
+  { name: "Guest 96",             prefix: "MR. & MRS." },
+  { name: "Guest 97",             prefix: "MR. & MRS." },
+  { name: "Guest 98",             prefix: "MR. & MRS." },
+  { name: "Guest 99",             prefix: "MR. & MRS." },
+  { name: "Guest 100",            prefix: "MR. & MRS." },
+  { name: "Guest 101",            prefix: "MR. & MRS." },
+  { name: "Guest 102",            prefix: "MR. & MRS." },
+  { name: "Guest 103",            prefix: "MR. & MRS." },
+  { name: "Guest 104",            prefix: "MR. & MRS." },
+  { name: "Guest 105",            prefix: "MR. & MRS." },
+  { name: "Guest 106",            prefix: "MR. & MRS." },
+  { name: "Guest 107",            prefix: "MR. & MRS." },
+  { name: "Guest 108",            prefix: "MR. & MRS." },
+  { name: "Guest 109",            prefix: "MR. & MRS." },
+  { name: "Guest 110",            prefix: "MR. & MRS." },
+  { name: "Guest 111",            prefix: "MR. & MRS." },
+  { name: "Guest 112",            prefix: "MR. & MRS." },
+  { name: "Guest 113",            prefix: "MR. & MRS." },
+  { name: "Guest 114",            prefix: "MR. & MRS." },
+  { name: "Guest 115",            prefix: "MR. & MRS." },
+  { name: "Guest 116",            prefix: "MR. & MRS." },
+  { name: "Guest 117",            prefix: "MR. & MRS." },
+  { name: "Guest 118",            prefix: "MR. & MRS." },
+  { name: "Guest 119",            prefix: "MR. & MRS." },
+  { name: "Guest 120",            prefix: "MR. & MRS." },
+  { name: "Guest 121",            prefix: "MR. & MRS." },
+  { name: "Guest 122",            prefix: "MR. & MRS." },
+  { name: "Guest 123",            prefix: "MR. & MRS." },
+  { name: "Guest 124",            prefix: "MR. & MRS." },
+  { name: "Guest 125",            prefix: "MR. & MRS." },
+  { name: "Guest 126",            prefix: "MR. & MRS." },
+  { name: "Guest 127",            prefix: "MR. & MRS." },
+  { name: "Guest 128",            prefix: "MR. & MRS." },
+  { name: "Guest 129",            prefix: "MR. & MRS." },
+  { name: "Guest 130",            prefix: "MR. & MRS." },
+  { name: "Guest 131",            prefix: "MR. & MRS." },
+  { name: "Guest 132",            prefix: "MR. & MRS." },
+  { name: "Guest 133",            prefix: "MR. & MRS." },
+  { name: "Guest 134",            prefix: "MR. & MRS." },
+  { name: "Guest 135",            prefix: "MR. & MRS." },
+  { name: "Guest 136",            prefix: "MR. & MRS." },
+  { name: "Guest 137",            prefix: "MR. & MRS." },
+  { name: "Guest 138",            prefix: "MR. & MRS." },
+  { name: "Guest 139",            prefix: "MR. & MRS." },
+  { name: "Guest 140",            prefix: "MR. & MRS." },
+  { name: "Guest 141",            prefix: "MR. & MRS." },
+  { name: "Guest 142",            prefix: "MR. & MRS." },
+  { name: "Guest 143",            prefix: "MR. & MRS." },
+  { name: "Guest 144",            prefix: "MR. & MRS." },
+  { name: "Guest 145",            prefix: "MR. & MRS." },
+  { name: "Guest 146",            prefix: "MR. & MRS." },
+  { name: "Guest 147",            prefix: "MR. & MRS." },
+  { name: "Guest 148",            prefix: "MR. & MRS." },
+  { name: "Guest 149",            prefix: "MR. & MRS." },
+  { name: "Guest 150",            prefix: "MR. & MRS." },
+  { name: "Guest 151",            prefix: "MR. & MRS." },
+  { name: "Guest 152",            prefix: "MR. & MRS." },
+  { name: "Guest 153",            prefix: "MR. & MRS." },
+  { name: "Guest 154",            prefix: "MR. & MRS." },
+  { name: "Guest 155",            prefix: "MR. & MRS." },
+  { name: "Guest 156",            prefix: "MR. & MRS." },
+  { name: "Guest 157",            prefix: "MR. & MRS." },
+  { name: "Guest 158",            prefix: "MR. & MRS." },
+  { name: "Guest 159",            prefix: "MR. & MRS." },
+  { name: "Guest 160",            prefix: "MR. & MRS." },
+  { name: "Guest 161",            prefix: "MR. & MRS." },
+  { name: "Guest 162",            prefix: "MR. & MRS." },
+  { name: "Guest 163",            prefix: "MR. & MRS." },
+  { name: "Guest 164",            prefix: "MR. & MRS." },
+  { name: "Guest 165",            prefix: "MR. & MRS." },
+  { name: "Guest 166",            prefix: "MR. & MRS." },
+  { name: "Guest 167",            prefix: "MR. & MRS." },
+  { name: "Guest 168",            prefix: "MR. & MRS." },
+  { name: "Guest 169",            prefix: "MR. & MRS." },
+  { name: "Guest 170",            prefix: "MR. & MRS." },
+  { name: "Guest 171",            prefix: "MR. & MRS." },
+  { name: "Guest 172",            prefix: "MR. & MRS." },
+  { name: "Guest 173",            prefix: "MR. & MRS." },
+  { name: "Guest 174",            prefix: "MR. & MRS." },
+  { name: "Guest 175",            prefix: "MR. & MRS." },
+  { name: "Guest 176",            prefix: "MR. & MRS." },
+  { name: "Guest 177",            prefix: "MR. & MRS." },
+  { name: "Guest 178",            prefix: "MR. & MRS." },
+  { name: "Guest 179",            prefix: "MR. & MRS." },
+  { name: "Guest 180",            prefix: "MR. & MRS." },
+  { name: "Guest 181",            prefix: "MR. & MRS." },
+  { name: "Guest 182",            prefix: "MR. & MRS." },
+  { name: "Guest 183",            prefix: "MR. & MRS." },
+  { name: "Guest 184",            prefix: "MR. & MRS." },
+  { name: "Guest 185",            prefix: "MR. & MRS." },
+  { name: "Guest 186",            prefix: "MR. & MRS." },
+  { name: "Guest 187",            prefix: "MR. & MRS." },
+  { name: "Guest 188",            prefix: "MR. & MRS." },
+  { name: "Guest 189",            prefix: "MR. & MRS." },
+  { name: "Guest 190",            prefix: "MR. & MRS." },
+  { name: "Guest 191",            prefix: "MR. & MRS." },
+  { name: "Guest 192",            prefix: "MR. & MRS." },
+  { name: "Guest 193",            prefix: "MR. & MRS." },
+  { name: "Guest 194",            prefix: "MR. & MRS." },
+  { name: "Guest 195",            prefix: "MR. & MRS." },
+  { name: "Guest 196",            prefix: "MR. & MRS." },
+  { name: "Guest 197",            prefix: "MR. & MRS." },
+  { name: "Guest 198",            prefix: "MR. & MRS." },
+  { name: "Guest 199",            prefix: "MR. & MRS." },
+  { name: "Guest 200",            prefix: "MR. & MRS." },
+  { name: "Guest 201",            prefix: "MR. & MRS." },
+  { name: "Guest 202",            prefix: "MR. & MRS." },
+  { name: "Guest 203",            prefix: "MR. & MRS." },
+  { name: "Guest 204",            prefix: "MR. & MRS." },
+  { name: "Guest 205",            prefix: "MR. & MRS." },
+  { name: "Guest 206",            prefix: "MR. & MRS." },
+  { name: "Guest 207",            prefix: "MR. & MRS." },
+  { name: "Guest 208",            prefix: "MR. & MRS." },
+  { name: "Guest 209",            prefix: "MR. & MRS." },
+  { name: "Guest 210",            prefix: "MR. & MRS." },
+  { name: "Guest 211",            prefix: "MR. & MRS." },
+  { name: "Guest 212",            prefix: "MR. & MRS." },
+  { name: "Guest 213",            prefix: "MR. & MRS." },
+  { name: "Guest 214",            prefix: "MR. & MRS." },
+  { name: "Guest 215",            prefix: "MR. & MRS." },
+  { name: "Guest 216",            prefix: "MR. & MRS." },
+  { name: "Guest 217",            prefix: "MR. & MRS." },
+  { name: "Guest 218",            prefix: "MR. & MRS." },
+  { name: "Guest 219",            prefix: "MR. & MRS." },
+  { name: "Guest 220",            prefix: "MR. & MRS." },
+  { name: "Guest 221",            prefix: "MR. & MRS." },
+  { name: "Guest 222",            prefix: "MR. & MRS." },
+  { name: "Guest 223",            prefix: "MR. & MRS." },
+  { name: "Guest 224",            prefix: "MR. & MRS." },
+  { name: "Guest 225",            prefix: "MR. & MRS." },
+  { name: "Guest 226",            prefix: "MR. & MRS." },
+  { name: "Guest 227",            prefix: "MR. & MRS." },
+  { name: "Guest 228",            prefix: "MR. & MRS." },
+  { name: "Guest 229",            prefix: "MR. & MRS." },
+  { name: "Guest 230",            prefix: "MR. & MRS." },
+  { name: "Guest 231",            prefix: "MR. & MRS." },
+  { name: "Guest 232",            prefix: "MR. & MRS." },
+  { name: "Guest 233",            prefix: "MR. & MRS." },
+  { name: "Guest 234",            prefix: "MR. & MRS." },
+  { name: "Guest 235",            prefix: "MR. & MRS." },
+  { name: "Guest 236",            prefix: "MR. & MRS." },
+  { name: "Guest 237",            prefix: "MR. & MRS." },
+  { name: "Guest 238",            prefix: "MR. & MRS." },
+  { name: "Guest 239",            prefix: "MR. & MRS." },
+  { name: "Guest 240",            prefix: "MR. & MRS." },
+  { name: "Guest 241",            prefix: "MR. & MRS." },
+  { name: "Guest 242",            prefix: "MR. & MRS." },
+  { name: "Guest 243",            prefix: "MR. & MRS." },
+  { name: "Guest 244",            prefix: "MR. & MRS." },
+  { name: "Guest 245",            prefix: "MR. & MRS." },
+  { name: "Guest 246",            prefix: "MR. & MRS." },
+  { name: "Guest 247",            prefix: "MR. & MRS." },
+  { name: "Guest 248",            prefix: "MR. & MRS." },
+  { name: "Guest 249",            prefix: "MR. & MRS." },
+  { name: "Guest 250",            prefix: "MR. & MRS." },
+];
+
+// ── State ────────────────────────────────────────────────────────
+let guests = [];
+
+function loadGuests() {
+  const saved = localStorage.getItem('wci-guests');
+  guests = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_GUESTS));
+}
+function saveGuests() {
+  localStorage.setItem('wci-guests', JSON.stringify(guests));
+}
+
+// ── Build link ───────────────────────────────────────────────────
+function buildLink(guest) {
+  const base   = document.getElementById('base-url').value.trim() || 'index.html';
+  const name   = encodeURIComponent(guest.name);
+  const prefix = encodeURIComponent(guest.prefix);
+  return `${base}?name=${name}&prefix=${prefix}`;
+}
+
+// ── Render table ─────────────────────────────────────────────────
+function renderTable() {
+  const query  = document.getElementById('search').value.trim().toLowerCase();
+  const tbody  = document.getElementById('tbody');
+  const filtered = guests.filter(g => g.name.toLowerCase().includes(query));
+
+  document.getElementById('stats').textContent =
+    `Showing ${filtered.length} of ${guests.length} guests`;
+
+  tbody.innerHTML = filtered.map((g, i) => {
+    const idx  = guests.indexOf(g);
+    const link = buildLink(g);
+    const waMsg = encodeURIComponent(
+      `Dear ${g.prefix} ${g.name},\n\nWe cordially invite you to the wedding of Charith & Maneesha on April 23, 2026.\n\nYour personalised invitation: ${link}`
+    );
+    const waUrl = `https://wa.me/?text=${waMsg}`;
+
+    return `
+      <tr>
+        <td class="num">${idx + 1}</td>
+        <td class="prefix-cell">${g.prefix}</td>
+        <td class="name-cell">${g.name}</td>
+        <td class="link-cell" title="${link}">${link}</td>
+        <td>
+          <button class="copy-btn" id="cb-${idx}" onclick="copyLink(${idx}, this)">📋 Copy</button>
+          <a class="wa-btn" style="text-decoration:none;display:inline-block;padding:4px 10px;border-radius:5px;font-size:0.78rem;font-weight:600;"
+             href="${waUrl}" target="_blank">💬 WhatsApp</a>
+          <button class="edit-btn" onclick="editGuest(${idx})">✏ Edit</button>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+// ── Refresh links (when base URL changes) ────────────────────────
+function refreshLinks() { renderTable(); }
+
+// ── Copy single link ─────────────────────────────────────────────
+function copyLink(idx, btn) {
+  const link = buildLink(guests[idx]);
+  navigator.clipboard.writeText(link).then(() => {
+    btn.textContent = '✅ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ── Copy ALL links ───────────────────────────────────────────────
+function copyAll() {
+  const all = guests.map((g, i) => `${i+1}. ${g.prefix} ${g.name}\n   ${buildLink(g)}`).join('\n\n');
+  navigator.clipboard.writeText(all).then(() => showToast('✅ All 250 links copied!'));
+}
+
+// ── Add guest ────────────────────────────────────────────────────
+function addGuest() {
+  const name   = document.getElementById('new-name').value.trim();
+  const prefix = document.getElementById('new-prefix').value;
+  if (!name) { showToast('⚠ Please enter a name'); return; }
+  guests.push({ name, prefix });
+  saveGuests();
+  document.getElementById('new-name').value = '';
+  renderTable();
+  showToast(`✅ Added: ${prefix} ${name}`);
+}
+
+// ── Edit guest inline ────────────────────────────────────────────
+function editGuest(idx) {
+  const g       = guests[idx];
+  const newName = prompt(`Edit name for guest ${idx + 1}:`, g.name);
+  if (newName === null) return;
+  const newPre  = prompt(`Edit prefix (MR. / MRS. / MISS / MR. & MRS. / DR. / REV.):`, g.prefix);
+  if (newPre === null) return;
+  guests[idx] = { name: newName.trim() || g.name, prefix: newPre.trim() || g.prefix };
+  saveGuests();
+  renderTable();
+}
+
+// ── Export CSV ───────────────────────────────────────────────────
+function exportCSV() {
+  const rows = [['#','Prefix','Name','Link']];
+  guests.forEach((g, i) => rows.push([i+1, g.prefix, g.name, buildLink(g)]));
+  const csv  = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = 'charith-maneesha-guests.csv';
+  a.click(); URL.revokeObjectURL(url);
+}
+
+// ── Toast notification ───────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── Init ─────────────────────────────────────────────────────────
+loadGuests();
+renderTable();
+</script>
+</body>
+</html>
