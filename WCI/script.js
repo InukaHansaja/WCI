@@ -101,21 +101,25 @@ function openCoverCard() {
   }, 900);
 }
 
-/* ── STEP 3: Click cover card (detached) → show main invitation card ─────────── */
+/* ── STEP 3: Click cover card → show main invitation card (skipping Step 2) ─────────── */
 function openMainCard() {
-  if (step !== 2) return;
-  step = 3;
+  if (step !== 1) return;
+  step = 2;
 
   const coverCard      = document.getElementById('cover-card');
+  const scene          = document.getElementById('scene');
   const invitationCard = document.getElementById('invitation-card');
   const rsvpPanel      = document.getElementById('rsvp-panel');
 
-  // flip / fade cover card away
-  coverCard.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-  coverCard.style.opacity    = '0';
-  coverCard.style.transform  = 'scale(0.95) translateY(-20px)';
-
+  // fade out envelope and cover card
+  scene.classList.add('fade-out');
+  
   setTimeout(() => {
+    scene.style.display = 'none';
+    
+    // show card-stage and invitation card
+    const cardStage = document.getElementById('card-stage');
+    cardStage.classList.add('visible');
     coverCard.style.display = 'none';
 
     // show main invitation card
@@ -128,14 +132,13 @@ function openMainCard() {
       launchConfetti();
     }, 800);
 
-  }, 600);
+  }, 700);
 }
 
 /* ── Attach click handlers ──────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('cover-card').addEventListener('click', () => {
-    if (step === 1) openCoverCard();
-    else if (step === 2) openMainCard();
+    if (step === 1) openMainCard();
   });
 });
 
