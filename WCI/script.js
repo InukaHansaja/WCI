@@ -167,8 +167,8 @@ function launchConfetti() {
   }));
 
   let frame = 0;
-  const totalFrames = 600; // Total animation frames
-  const fadeStartFrame = 300; // Start fading at 4 seconds
+  const totalFrames = 1000; // Total animation frames
+  const fadeStartFrame = 600; // Start fading at 4 seconds
   
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -199,3 +199,4 @@ function launchConfetti() {
   }
   draw();
 }
+
