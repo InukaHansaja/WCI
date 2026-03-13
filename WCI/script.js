@@ -25,6 +25,11 @@ function startEnvelope() {
   if (step !== 0) return;
   step = 1;
 
+  // play background music
+const backgroundMusic = document.getElementById('background-music');
+backgroundMusic.play();
+
+
   // hide prompt
   const prompt = document.getElementById('click-prompt');
   prompt.classList.add('hidden');
