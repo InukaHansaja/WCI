@@ -158,13 +158,27 @@ function launchConfetti() {
     speed: Math.random() * 3 + 1,
     angle: Math.random() * Math.PI * 2,
     spin:  (Math.random() - 0.5) * 0.2,
+    opacity: 1,
   }));
 
   let frame = 0;
+  const totalFrames = 600; // Total animation frames
+  const fadeStartFrame = 300; // Start fading at 4 seconds
+  
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Fade out after 4 seconds
+    if (frame >= fadeStartFrame) {
+      const fadeProgress = (frame - fadeStartFrame) / (totalFrames - fadeStartFrame);
+      pieces.forEach(p => {
+        p.opacity = Math.max(0, 1 - fadeProgress);
+      });
+    }
+    
     pieces.forEach(p => {
       ctx.save();
+      ctx.globalAlpha = p.opacity; // Apply fade
       ctx.translate(p.x + p.w / 2, p.y + p.h / 2);
       ctx.rotate(p.angle);
       ctx.fillStyle = p.color;
@@ -175,7 +189,7 @@ function launchConfetti() {
       if (p.y > canvas.height) { p.y = -10; p.x = Math.random() * canvas.width; }
     });
     frame++;
-    if (frame < 200) requestAnimationFrame(draw);
+    if (frame < totalFrames) requestAnimationFrame(draw);
     else ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
   draw();
